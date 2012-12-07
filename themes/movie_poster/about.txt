@@ -1,0 +1,3 @@
+Author: Richard Testani Jr.
+Theme Name: Movie Posters
+Description: An image gallery designed for movie posters.

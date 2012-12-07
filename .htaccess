@@ -1,0 +1,12 @@
+#----------------
+# File Upload overrides
+#----------------
+php_value upload_max_filesize 20M
+php_value post_max_size 20M
+
+#----------------
+# Default rewrite
+#----------------
+RewriteEngine on
+RewriteCond $1 !^(index\.php|robots\.txt|assets|uploads|themes)
+RewriteRule ^(.*)$ /index.php/$1 [L]

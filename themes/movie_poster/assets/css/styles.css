@@ -1,0 +1,83 @@
+/* ------------------
+	Table of Content
+	
+	0: Resets
+	1: Header & Nav
+	2: Layout
+	3: Images
+	
+--------------------*/
+
+/* ------------------
+	0) Resets
+--------------------*/
+html, body, div, p, ul, li, ol, h1, h2, h3, h4, h5 {
+	padding: 0;
+	margin: 0;
+}
+
+/* ------------------
+	1) Header & Nav
+--------------------*/
+
+header #logo {
+	text-align: center;
+	padding: 15px 0;
+}
+
+header nav {
+	background-color: black;
+	width: 100%;
+	overflow: hidden;
+}
+
+header nav ul {
+	width: 320px;
+	margin: 0 auto;
+}
+
+header nav li {
+	float: left;
+	margin: 0 10px;
+}
+
+header nav li a {
+	display: block;
+	color: white;
+	text-decoration: none;
+	font: 48px 'OstrichSansCondensedLight';
+	padding: 8px 0;
+}
+
+/* ------------------
+	2) Layout
+--------------------*/
+#content {
+	width: 1140px;
+	margin: 20px auto 0;
+}
+
+/* ------------------
+	3) Images
+--------------------*/
+.listing article.image_thumb {
+	float: left;
+	width: 180px;
+	height: 220px;
+	text-align: center;
+}
+
+.listing .image_group {
+	width: 80%;
+	margin: 0 auto;
+	font: bold 12px "Lucida Grande", Lucida, Verdana, sans-serif;
+}
+
+
+
+/* ------------------
+	3) Footer
+--------------------*/
+footer {
+	clear: both;
+}

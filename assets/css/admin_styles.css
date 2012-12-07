@@ -1,0 +1,65 @@
+/* RESETS */
+html, body, h1, h2, h3, h4, h5, h6, p, ul, ol, dl, li {
+	padding: 0;
+	margin: 0;
+}
+
+header {
+	height: 100px;
+	background: #f1a59e;
+	border-bottom: 2px solid #ed606e;
+}
+
+header nav ul {
+	list-style-type: none;
+	float: right;
+	position: relative;
+}
+
+header nav li {
+	float: left;
+	margin-right: 10px;
+	position: relative;
+}
+
+header nav li a {
+	position: relative;
+	background-color: #8cab9a;
+	padding: 10px 20px;
+	color: #f4ceb0;
+	font: 20px 'Lobster Two', cursive;
+	border-bottom-right-radius: 4px;
+	border-bottom-left-radius: 4px;
+	text-decoration: none;
+	text-shadow: 0 1px 1px #2b4f3b;
+}
+
+header nav li a:hover {
+	background-color: #66aa83;
+}
+
+header #subnav {
+	clear: both;
+}
+
+header #subnav li a {
+	font-family: Helvetica;
+	font-size: 12px;
+	border-bottom-right-radius: 0px;
+	border-bottom-left-radius: 0px;
+	background-color: black;
+	color: white;
+}
+
+#logo {
+	float: left;
+	margin: 20px 0;
+}
+
+#content{
+	clear: both;
+}
+
+#url_input {
+	display: none;
+}
