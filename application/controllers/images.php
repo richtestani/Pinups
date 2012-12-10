@@ -9,6 +9,7 @@ class Images extends Pinups_Controller {
 		$this->assets->set_asset_path($this->themes_lib->theme_location().'/'.$this->theme['theme_name'].'/assets/');
 		$this->data['nav'] = $this->navigation->build_navigation();
 		$this->data['sizes'] = $this->config->item('size');
+		$this->data['thumb'] = $this->config->item('thumb');
 		$this->assets->set_asset('mp_logo.png', 'img');
 		$this->assets->set_asset(array(
 									'name'=>'styles',
@@ -26,7 +27,7 @@ class Images extends Pinups_Controller {
 	public function index($id, $return = false) {
 	
 		$id = (int) $id;
-
+		
 		if($id == 0) {
 			echo 'not a number';
 			return false;
@@ -34,13 +35,16 @@ class Images extends Pinups_Controller {
 		
 		$this->data['pinups'] = $this->pinups->get('id', array(
 													'where'=> array(
-															'where' => 'where',
-															'field'=>'id',
-															'value' => $id
-																	)
-																) 
+																array(
+																	'where' => 'where',
+																	'field'=>'p.id',
+																	'values' => $id,
+																)
+															),
+													'limit' => array('limit' => 1)
+														)
 													);
-													
+					
 		$path = $this->themes_lib->theme_location().'/'.$this->theme['theme_name'];
 		$this->data['page_title'] = 'Home Page';
 		$this->data['styles'] = $this->assets->css('styles');
@@ -57,13 +61,24 @@ class Images extends Pinups_Controller {
 		$upload_path = ROOT.$this->upload_config['upload_path'];
 		$width = $this->data['sizes'][$this->data['size']];
 		$size = $this->data['size'];
+		
 		if(!$this->pinups->image_exists($current_image)) {
+			
 			$original = ROOT.$this->data['upload_path']
 								.$this->data['pinups']->path_to_file.'original/'.$this->data['pinups']->filename;
 			$new_path = $upload_path.$this->data['pinups']->path_to_file.$size.'/';
-			$this->pinups->transform('resize', $original, array('width'=>$width, 'path'=>$new_path, 'filename'=>$this->data['pinups']->filename));
+			$data['size'] = $size;
+			$data['path'] = $new_path;
+			$data['width'] = $width;
+			$data['filename'] = $this->data['pinups']->filename;
+			
+			$this->pinups->transform('resize', $original, $data);
 		}
 		if(!$return) {
+			$this->data['image_path'] = $this->data['upload_path']
+										.$this->data['pinups']->path_to_file
+										.$size
+										.DIRECTORY_SEPARATOR;
 			$this->data['content'] = $this->load->view($path.'/image', $this->data, true);
 			$this->load->view($path.'/single', $this->data);
 		}
@@ -74,12 +89,11 @@ class Images extends Pinups_Controller {
 		$this->index($id);
 	}
 	
-	public function size($size, $id = 0) {
-		echo $size;
-		
+	public function size( $size, $id = 0, $overwrite = false ) {
+
 		$id = (int) $id;
 		
-		if( $id == 0) {
+		if( $id == 0 ) {
 			echo 'not an image';
 			return false;
 		}
@@ -91,29 +105,86 @@ class Images extends Pinups_Controller {
 		
 		/*
 			Build file on the fly
+			If size is a number,
+			generate image to that width
 		*/
-		if(is_numeric($size)) {
-			$data['width'] = (int) $size;
-			$data['size'] = 'custom';
-			$size = 'custom';
-		} else {
-			$data['size'] = $size;
-		}
-		$this->data['size'] = $size;
+		if( is_numeric($size) ) {
 		
-		$current_image = ROOT.$this->data['upload_path']
-							.$this->data['pinups']->path_to_file
-							.$size
-							.'/'
-							.$this->data['pinups']->filename;
-
-		if(!$this->pinups->image_exists($current_image)) {
-			$original = ROOT.$this->data['upload_path']
-								.$this->data['pinups']->path_to_file.'original/'.$this->data['pinups']->filename;
-			$this->pinups->transform('resize', $original, $size);
+			$data['width'] 		= (int) $size;
+			$data['size'] 		= 'custom';
+			$size 				= 'custom';
+			$data['overwrite'] 	= $overwrite;
+			
+			$this->data['image_path'] = $this->data['upload_path']
+										.$this->data['pinups']->path_to_file
+										.$size
+										.DIRECTORY_SEPARATOR
+										.$data['width']
+										.DIRECTORY_SEPARATOR;
+			
+		} else {
+			
+			if( $size == 'thumbnail' || $size == 'thumb' ) {
+			
+				$data['size'] = $size;
+				$data['overwrite'] = true;
+			
+			} else {
+			
+				$data['size'] 		= $size;
+				$data['overwrite'] 	= $overwrite;
+				
+				$this->data['image_path'] = $this->data['upload_path']
+											.$this->data['pinups']->path_to_file
+											.DIRECTORY_SEPARATOR
+											.$size
+											.DIRECTORY_SEPARATOR;
+			
+			}
+			
+			
 		}
-		$this->data['content'] = $this->load->view($this->data['theme_path'].'/image', $this->data);
-		$this->load->view($this->data['theme_path'].'/single', $this->data);
+	
+		$this->data['size'] 	= $size;
+	
+		$current_image 			= ROOT
+									.$this->data['upload_path']
+									.$this->data['pinups']->path_to_file
+									.$size
+									.DIRECTORY_SEPARATOR
+									.$this->data['pinups']->filename;
+		
+									
+		if( $data['overwrite'] ) {
+			
+			
+			$this->pinups->transform( 'resize', $original, $data );
+			
+		
+		} elseif( !$this->pinups->image_exists( $current_image ) ) {
+			
+			
+			$original 			= ROOT
+									.$this->data['upload_path']
+									.$this->data['pinups']->path_to_file
+									.'original'
+									.DIRECTORY_SEPARATOR
+									.$this->data['pinups']->filename;
+									
+			$data['path'] = ROOT
+										.$this->data['upload_path']
+										.$this->data['pinups']->path_to_file
+										.$size
+										.DIRECTORY_SEPARATOR;
+									
+			$this->pinups->transform( 'resize', $original, $data );
+			
+			
+			
+		}
+				
+		$this->data['content'] = $this->load->view( $this->data['theme_path'].'/image', $this->data, TRUE );
+		$this->load->view( $this->data['theme_path'].'/single', $this->data );
 		
 	}
 	

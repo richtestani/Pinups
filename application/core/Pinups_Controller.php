@@ -88,8 +88,10 @@ class Pinups_Controller extends CI_Controller {
 		if( $uri == 'admin' ) {
 		
 			$this->is_admin = true;
-			$this->navigation->path_to_navigation(realpath(realpath(APPPATH).'/controllers/admin'));
+			$this->navigation->files_to_navigation(realpath(realpath(APPPATH).'/controllers/admin'));
+
 			$this->navigation->filter(array('ajax'));
+			$this->data['current_page'] = $this->navigation->get_current_page();
 			$this->data['nav'] = $this->navigation->get_nav();
 			$this->data['curl_support'] = $this->curl_support;
 		}

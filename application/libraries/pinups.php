@@ -13,38 +13,50 @@ class Pinups {
 		$this->CI->load->library('image_transform');
 		$this->CI->load->library('output');
 		$this->sizes = $this->CI->config->item('sizes');
-		
 	
 	}
 	
-	public function find($by, $data) {
+	public function find( $by, $data ) {
 
-		if(!method_exists($this->CI->imgs, $by)) {
+		if( !method_exists( $this->CI->imgs, $by ) ) {
+		
 			echo 'not right';
 			return false;
+			
 		}
-
+		
+		/*
+			Lookup images by 
+		*/
 		$this->CI->imgs->{$by}($data);
 		$result = $this->CI->imgs->result();
 		
 		if( count($result) == 1 ) {
+		
 			$this->pinups = $this->CI->image_manager->build_image($result);
+			
 		} else {
+		
 			foreach ($result as $key => $value) {
+			
 				$this->pinups[] = $this->CI->image_manager->build_image($value);
 			}
 		}
 		
 	}
 	
-	public function get_pinups($by = '', $data = array() ) {
+	public function get_pinups( $by = '', $data = array() ) {
 		
-		if(empty($data) || is_array($by)) {
-			$this->find('all', $data);
+		if( empty($data) || is_array($by) ) {
+		
+			$this->find( 'all', $data );
 			return $this->pinups;
+			
 		} else {
-			$this->find($by, $data);
+		
+			$this->find( $by, $data );
 			return $this->pinups;
+			
 		}
 		
 	}
@@ -55,11 +67,14 @@ class Pinups {
 	
 	}
 	
-	public function image_exists($path_to_image) {
+	public function image_exists( $path_to_image ) {
 	
-		if(!file_exists($path_to_image)) {
+		if( !file_exists( $path_to_image ) ) {
+		
 			return false;
 		}
+		
+		return true;
 	
 	}
 
@@ -74,12 +89,16 @@ class Pinups {
 		
 	}
 	
-	public function get($by, $data) {
-		return $this->get_pinups($by, $data);
+	public function get( $by, $data = array() ) {
+	
+		return $this->get_pinups( $by, $data );
+		
 	}
 	
-	public function __call($name, $args) {
+	public function __call( $name, $args ) {
+	
 		echo $name;
+		
 	}
 
 }

@@ -18,7 +18,6 @@ class Navigation {
 		$this->current = $uri;
 	}
 	
-	public function path_to_navigation($path) {
 
 		if(file_exists($path)) {
 		
@@ -30,7 +29,6 @@ class Navigation {
 				$this->nav[$count]['original'] = $value;
 				$this->nav[$count]['basename'] = $section_segment;
 				$this->nav[$count]['label'] = $this->transform('humanize', $section_segment);
-				$this->nav[$count]['href'] = './'.$section_segment;
 				
 				$count++;
 			}

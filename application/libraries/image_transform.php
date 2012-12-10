@@ -10,45 +10,108 @@ class Image_Transform {
  
  	$this->CI = get_instance();
  	$this->CI->load->library('image_lib');
- 	$this->sizes = $this->CI->config->item('size');
  
  }
  
  public function set_image_data($data) {
+ 
  	$this->image_config = $data;
+ 	
  }
  
- public function resize($file, $data) {
-	 	
- 	if(is_array($data)) {
- 		if(!array_key_exists('width', $data)) {
+ public function resize( $file, $data ) {
+ 
+ 	$overwrite = false;
+ 	$crop = false;
+ 	$maintain_ratio = false;
+	
+ 	if( is_array( $data ) ) {
+ 	
+ 		if( !array_key_exists( 'width', $data ) ) {
+ 		
  			return 'requires a width parameter';
+ 			
  		} else {
+ 		
  			$width = $data['width'];
+ 			
  		}
  	}
  	
-
- 	$file_size = getimagesize($file);
+ 	$file_size 		= getimagesize( $file );
+ 	$orig_width		= $file_size[0];
+ 	$orig_height	= $file_size[1];
  	
- 	$ratio = $file_size[1] / $file_size[0];
- 	$new_height = $file_size[1] / $ratio;
+ 	/*
  	
- 	$new_name = $width.'_'.$data['filename'];
- 	$dest = $data['path'];
- 	$config['width'] = $width;
- 	$config['height'] = $new_height;
- 	$config['maintain_ratio'] = false;
- 	$config['source_image'] = $file;
- 	$config['new_image'] = $dest;
-
- 	$this->CI->image_lib->initialize($config); 
- 	if(!file_exists($dest)) {
+ 		If the new width is larger than the original width.
+ 		In this case we need to enlarge the height proportionately
+ 	
+ 	*/
+ 	if( $width > $orig_width ) {
+ 		
+ 		$ratio 			= $orig_height / $orig_width;
+ 		$new_height 	= $width * $ratio;
+ 		
+ 	} else {
+ 		
+ 		$ratio 			= $orig_width / $orig_height;
+ 		
+ 		/*
+ 		
+ 			If the original width is less than the original height,
+ 			then we are dealing with a landscape oriented image
+ 		
+ 		*/
+ 		if( $orig_width > $orig_height ) {
+ 		
+ 			$new_height = $orig_width * $ratio;
+ 		
+ 		} else {
+ 			
+ 			$ratio 			= $orig_height / $orig_width;
+ 			$new_height 	= $width * $ratio;
+ 		
+ 		}
+ 	
+ 	}
+ 	
+ 	if( array_key_exists( 'height', $data ) ) {
+ 	
+ 		$new_height = $data['height'];
+ 	
+ 	}
+ 	print_r($data);
+ 	if( $data['size'] == 'custom' ) {
+ 	
+ 		$data['path'] = $data['path'].$width;
+ 		
+ 	}
+ 
+ 	$dest 						= $data['path'];
+ 	
+ 	$config['width'] 			= $width;
+ 	$config['height'] 			= $new_height;
+ 	$config['maintain_ratio'] 	= $maintain_ratio;
+ 	$config['crop']				= $crop;
+ 	$config['source_image'] 	= $file;
+ 	$config['new_image'] 		= $dest;
+	
+ 	$this->CI->image_lib->initialize( $config ); 
+ 	
+ 	if(!file_exists( $dest )) {
+ 	
  		mkdir($dest, 0777, true);
+ 		
  	}
+ 	
  	if( !$this->CI->image_lib->resize() ) {
+ 	
  		echo $this->CI->image_lib->display_errors();
+ 		
  	}
+ 	
+ 	$this->CI->image_lib->clear();
  }
 
 }

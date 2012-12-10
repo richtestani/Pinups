@@ -11,7 +11,7 @@ class Images_Model extends Pinups_Model {
 		$this->pinups_table = 'pinups as p';
 		$this->groups_table = 'pinups_groups as g';
 		
-		$this->fields = array(
+		$this->fieldset = array(
 							
 							'pinups' => array(
 											
@@ -87,59 +87,194 @@ class Images_Model extends Pinups_Model {
 	
 	public function id($data) {
 	
-		$result = $this->all($data);
+		$result = $this->all( $data );
 	
 	}
 	
-	public function all($data) {
+	public function all( $data ) {
 	
-		if( !empty($data) && is_array($data) ) {
-			extract($data);
+		if( is_array( $data ) AND !empty( $data ) ) {
+		
+			extract( $data );
+			
 		}
 		
-		$this->db->select(implode(", ", $this->fields['pinups']));
-		$this->db->select(implode(", ", $this->fields['pinups_groups']));
-		$this->db->from($this->pinups_table);
+		if( isset( $fields ) ) {
 		
-		if(isset($order_by)) {
-			$this->db->order_by(implode(", ", $order_by), 'asc');
+			$this->set_fields( $fields );
+			
 		} else {
-			extract($this->order_by);
-			$this->db->order_by($fields, $direction);
+		
+			$this->db->select( implode( ", ", $this->fieldset['pinups'] ) );
+			$this->db->select( implode( ", ", $this->fieldset['pinups_groups'] ) );
+			
 		}
 		
-		if(isset($limit)) {
-			$this->db->limit($limit, $offset);
+		if( isset( $from ) ) {
+		
+			if( is_array( $var ) ) {
+				
+				$tables = implode( ", ", $from );
+				
+			} else {
+				
+				$tables = $from;
+			
+			}
+			
+			$this->db->from($tables);
+		
+		} else {
+		
+			$this->db->from('pinups as p');
+		
 		}
 		
-		$this->db->join($this->groups_table, 'p.group_id=g.id', 'left');
-		
-		if(isset($where)) {
-			$this->filter($where);
+		if( isset( $where ) ) {
+			
+			$this->filter( $where );
+			
 		}
+		
+		if( isset( $join ) ) {
+		
+			$this->set_join( $join );
+		
+		} else {
+		
+			$this->set_join( array() );
+		
+		}
+		
+		if( isset( $like ) ) {
+		
+			$this->like_match( $like );
+		
+		}
+	
+		/*
+			Set the limits
+		*/
+		
+		$limit_num	= ( isset( $limit ) AND @array_key_exists( 'limit', $limit ) )	? $limit['limit']	: 48;
+		$offset 	= ( isset( $limit ) AND @array_key_exists( 'offset', $limit ) )	? $limit['offset']	: 0;
+
+		$this->db->limit( $limit_num, $offset );
+		
+		
+		$order_field = ( isset( $order_by ) AND array_key_exists( 'fields', $order_by ) ) ? $order_by['fields'] : $this->order_by['fields'];
+		$order_dir = ( isset( $order_by ) AND array_key_exists( 'direction', $order_by ) ) ? $order_by['direction'] : $this->order_by['direction'];
+		
+		$this->db->order_by($order_field, $order_dir);
 		
 		return $this;
 				
 	}
 	
-	public function filter($where) {
+	/*
+		Build select fields
+	*/
+	private function set_fields($fields) {
+	
+		$fieldsets = array_keys($this->fieldsets);
 		
-		if(isset($where)) {
+		if( is_array( $fields ) ) {
+		
+			foreach ( $fields as $value ) {
 			
-			switch($where['where']) {
-			
-				case 'where':
+				if( in_array( $value, $fieldsets ) ) {
 				
-				$this->db->where('p.'.$where['field'], $where['value']);
-				break;
+					$this->db->select( implode(", ", $this->fieldset[$value]) );
+					
+				} else {
 				
-				case 'like':
-				break;
-			
+					$this->db->select($value);
+					
+				}
 			}
+		
+		} else {
+		
+			$this->db->select( implode(", ", $fields) );
+		
+		}
+		
+	}
+	
+	private function like_match( $like ) {
+	
+	
+	}
+	
+	private function set_join( $join ) {
+	
+		if( !array( $join ) ) {
+		
+			echo '$join should be an array';
+			return false;
+		
+		}
+		
+		if( empty( $join ) ) {
+		
+			$this->db->join('pinups_groups as g', 'p.group_id = g.id', 'left');
+		
+		}
+		
+		foreach ( $join as $key => $value ) {
+			
+			$table	= isset( $value['table'] ) 			? $value['table'] 		: 'pinups_groups as g';
+			$on		= isset( $value['on'] ) 			? $value['on'] 			: 'p.group_id = g.id';
+			$join_type = isset( $value['join_type'] ) 	? $value['join_type'] 	: 'left';
+			
+			$this->db->join($table, $on, $join_type);
 			
 		}
 	
+	}
+	
+	
+	
+	private function filter( $where ) {
+	
+		$field = 'p.id';
+		$backticks = false;
+		$operation = '';
+		$values = 1;
+		$method = 'where';
+		
+		if( !is_array( $where ) ) {
+		
+			echo '$where should be an array';
+			return false;
+		
+		} else {
+		
+			foreach ($where as $key => $val) {
+				
+				if( is_array( $val ) ) {
+					
+					$method 	= isset( $val['where'] ) 		? $val['where'] 			: 'where';
+					$field		= isset( $val['field'] ) 		? $val['field'] 			: '*';
+					$values		= isset( $val['values'] ) 	? $val['values'] 			: 1;
+					$operation 	= isset( $val['operation'] ) 	? $val['operation'] 	: '';
+					$backticks 	= isset( $val['backticks'] ) 	? $val['backticks'] 		: true;
+					
+					$this->db->$method($field.' '.trim($operation), $values, $backticks);
+					
+				
+				} else {
+		
+					$$key = $val;
+					
+				}
+				
+			}
+			
+			$this->db->$method($field.' '.trim($operation), $values, $backticks);
+		
+		}
+		
 	}
 	
 	public function result() {
