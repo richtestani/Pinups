@@ -40,5 +40,22 @@ class Links_Model extends Pinups_Model {
 		
 	}
 	
+	public function image_categories($pinupid) {
+	
+		$this->db->select('*');
+		
+	
+	}
+	
+	public function image_tags($fields) {
+		/*
+			SELECT * FROM pinups as p LEFT JOIN pinups_groups as g ON g.id = p.group_id
+			LEFT JOIN pinups_links as l ON l.pinupid = p.id
+			LEFT JOIN pinups_tags as t ON l.itemid = t.id
+		*/
+
+		
+	}
+	
 
 }

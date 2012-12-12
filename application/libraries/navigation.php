@@ -12,6 +12,7 @@ class Navigation {
 		$this->ci->load->helper('inflector');
 		$this->ci->load->model('navigation_model', 'nav', true);
 		
+		$this->current = $this->ci->uri->segment(1);
 	}
 	
 	public function initialize($uri) {

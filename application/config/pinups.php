@@ -14,6 +14,7 @@ $config['thumb']['height']	= '298px';
 $config['thumb']['width']	= '200';
 $config['thumb']['height']	= '298';
 $config['thumb']['crop']	= true;
+$config['thumb']['position'] = 'center';
 $config['thumb']['prefix']	= 't_';
 $config['thumb']['suffix'] = '';
 

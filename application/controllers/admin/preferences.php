@@ -22,6 +22,7 @@ class Preferences extends Pinups_Controller {
 		
 	}
 	
+	public function generate_thumbnails($start = false) {
 	public function plugin() {
 		echo 'plugins';
 	}

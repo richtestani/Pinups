@@ -49,6 +49,7 @@ class Image_Transform {
  	
  	*/
  	if( $width > $orig_width ) {
+ 	if( $orig_width > $orig_height ) {
  		
  		$ratio 			= $orig_height / $orig_width;
  		$new_height 	= $width * $ratio;

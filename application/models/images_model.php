@@ -43,6 +43,32 @@ class Images_Model extends Pinups_Model {
 											'stub'				=> 'g.stub as group_stub',
 											'created_on'		=> 'g.created_on as group_creation',
 											'modified_on'		=> 'g.modified_on as group_modified'
+											),
+							
+							'pinups_categories' => array(
+														
+											'id'				=> 'c.id as category_id',
+											'name'				=> 'c.name as category',
+											'slug'				=> 'c.slug as category_slug',
+											'parent'			=> 'c.parent as category_parent',
+											'created_on'		=> 'c.created_on as category_creation',
+											'modified_on'		=> 'c.modified_on as category_modified'
+										
+													),
+							'pinups_link'		=> array(
+											'id'				=> 'l.id as link_id',
+											'itemid'			=> 'l.itemid',
+											'pinupid'			=> 'l.pinupid as link_pinup_id',
+											'created_on'		=> 'l.created_on as link_creation',
+											'modified_on'		=> 'l.modified_on as link_modified',
+											'item'				=> 'l.item as link_item'
+												
+												),
+							'pinups_tags' => array(
+											'id'				=> 't.id as tag_id',
+											'tag'				=> 't.tag',
+											'created_on'		=> 't.created_on as tag_creation',
+											'modified_on'		=> 't.modified_on as tag_modified'
 											)
 		
 							);
@@ -281,8 +307,8 @@ class Images_Model extends Pinups_Model {
 		
 		$q = $this->db->get();
 		$result = $q->result_array();
-
-		//echo $this->db->last_query();
+		
+		echo $this->db->last_query();
 		return $result;
 		
 	}
