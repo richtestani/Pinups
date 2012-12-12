@@ -41,64 +41,48 @@ class Image_Transform {
  	$file_size 		= getimagesize( $file );
  	$orig_width		= $file_size[0];
  	$orig_height	= $file_size[1];
+ 	extract($data);
+ 	
+ 	$ratio 			= $orig_width / $orig_height;
  	
  	/*
  	
- 		If the new width is larger than the original width.
- 		In this case we need to enlarge the height proportionately
- 	
+ 		If the original width is larger than the original width,
+ 		we are working with landscape orientation
  	*/
- 	if( $width > $orig_width ) {
+ 	
  	if( $orig_width > $orig_height ) {
  		
+ 		$new_height = $width / $ratio;
+ 	
+ 	} else {
+ 	
  		$ratio 			= $orig_height / $orig_width;
  		$new_height 	= $width * $ratio;
- 		
- 	} else {
- 		
- 		$ratio 			= $orig_width / $orig_height;
- 		
- 		/*
- 		
- 			If the original width is less than the original height,
- 			then we are dealing with a landscape oriented image
- 		
- 		*/
- 		if( $orig_width > $orig_height ) {
- 		
- 			$new_height = $orig_width * $ratio;
- 		
- 		} else {
- 			
- 			$ratio 			= $orig_height / $orig_width;
- 			$new_height 	= $width * $ratio;
- 		
- 		}
  	
  	}
- 	
+ 	 	
  	if( array_key_exists( 'height', $data ) ) {
  	
  		$new_height = $data['height'];
  	
  	}
- 	print_r($data);
+ 	
  	if( $data['size'] == 'custom' ) {
  	
  		$data['path'] = $data['path'].$width;
  		
  	}
- 
+ 	print_r($data);
  	$dest 						= $data['path'];
  	
- 	$config['width'] 			= $width;
- 	$config['height'] 			= $new_height;
  	$config['maintain_ratio'] 	= $maintain_ratio;
- 	$config['crop']				= $crop;
+ 	
  	$config['source_image'] 	= $file;
  	$config['new_image'] 		= $dest;
-	
- 	$this->CI->image_lib->initialize( $config ); 
+ 	$config['width'] 			= $width;
+ 	$config['height'] 			= $new_height;
+	 
  	
  	if(!file_exists( $dest )) {
  	
@@ -106,13 +90,57 @@ class Image_Transform {
  		
  	}
  	
- 	if( !$this->CI->image_lib->resize() ) {
- 	
- 		echo $this->CI->image_lib->display_errors();
+ 	if( $crop ) {
+
  		
+ 		
+ 		$this->CI->image_lib->initialize( $config );
+ 		
+ 		if( !$this->CI->image_lib->crop() ) {
+ 			
+ 			echo $this->CI->image_lib->display_errors();
+ 			
+ 		}
+ 	
+ 	
+ 	} else {
+ 		
+ 		$this->CI->image_lib->initialize( $config );
+ 		
+ 		if( !$this->CI->image_lib->resize() ) {
+ 		
+ 			echo $this->CI->image_lib->display_errors();
+ 			
+ 		}
+ 	
  	}
  	
+ 	
+ 	
  	$this->CI->image_lib->clear();
+ }
+ 
+ private function set_image_position( $data ) {
+ 
+ 	if( !array_key_exists( 'width', $data ) AND
+ 		!array_key_exists( 'height', $data ) AND
+ 		!array_key_exists( 'x_axis', $data ) AND
+ 		!array_key_exists( 'y_axis', $data ) AND 
+ 		!array_key_exists( 'position', $data ) ) {
+ 			return false;
+ 		}
+ 
+ 	extract($data);
+ 	
+ 	switch( $position ) {
+ 	
+ 		case 'center':
+ 		$midw = $width / 2;
+ 		$midh = $height / 2;
+ 	
+ 	}
+ 	
+ 
  }
 
 }

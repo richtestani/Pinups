@@ -30,6 +30,7 @@ class Navigation {
 				$this->nav[$count]['original'] = $value;
 				$this->nav[$count]['basename'] = $section_segment;
 				$this->nav[$count]['label'] = $this->transform('humanize', $section_segment);
+				$this->nav[$count]['href'] = '.'.DIRECTORY_SEPARATOR.$section_segment;
 				
 				$count++;
 			}
