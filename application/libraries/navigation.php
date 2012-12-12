@@ -13,12 +13,14 @@ class Navigation {
 		$this->ci->load->model('navigation_model', 'nav', true);
 		
 		$this->current = $this->ci->uri->segment(1);
+		
 	}
 	
 	public function initialize($uri) {
 		$this->current = $uri;
 	}
 	
+	public function files_to_navigation($path) {
 
 		if(file_exists($path)) {
 		
@@ -31,6 +33,11 @@ class Navigation {
 				$this->nav[$count]['basename'] = $section_segment;
 				$this->nav[$count]['label'] = $this->transform('humanize', $section_segment);
 				$this->nav[$count]['href'] = '.'.DIRECTORY_SEPARATOR.$section_segment;
+				if( $this->nav[$count]['href'] == $section_segment) {
+					$this->nav[$count]['active'] = true;
+				} else {
+					$this->nav[$count]['active'] = false;
+				}
 				
 				$count++;
 			}
@@ -141,6 +148,10 @@ class Navigation {
 	
 	public function get_subnav() {
 		return $this->subnav;
+	}
+	
+	public function get_current_page() {
+		return $this->current;
 	}
 
 }
